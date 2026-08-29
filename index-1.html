@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام تعبئة الثلاجات</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --accent-color: #10b981;
+            --text-color: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --danger-color: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 12px;
+            padding-bottom: 30px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 16px;
+            padding: 10px;
+        }
+
+        .header h1 {
+            font-size: 1.4rem;
+            color: var(--accent-color);
+            font-weight: 700;
+        }
+
+        .icon-svg {
+            width: 22px;
+            height: 22px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            display: inline-block;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+        }
+
+        label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 8px;
+            margin-bottom: 6px;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+
+        input, select, button {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background-color: #0f172a;
+            color: white;
+            font-size: 1rem;
+            margin-bottom: 8px;
+            outline: none;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--accent-color);
+        }
+
+        button {
+            background-color: var(--accent-color);
+            color: #000;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        button:active {
+            opacity: 0.85;
+            transform: scale(0.98);
+        }
+
+        button.btn-danger {
+            background-color: rgba(239, 68, 68, 0.15);
+            color: var(--danger-color);
+            border: 1px solid var(--danger-color);
+            width: auto;
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            margin: 0;
+        }
+
+        .flex-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .counter-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #0f172a;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .counter-btn {
+            width: 38px;
+            height: 38px;
+            font-size: 1.2rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--card-bg);
+            color: var(--accent-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+
+        .tab-btn {
+            background-color: var(--card-bg);
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+            padding: 10px 6px;
+            font-size: 0.9rem;
+            flex: 1;
+        }
+
+        .tab-btn.active {
+            background-color: var(--accent-color);
+            color: black;
+            font-weight: bold;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 1.1rem;
+        }
+
+        .item-list-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            background: #0f172a;
+            border-radius: 6px;
+            margin-top: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        .empty-msg {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <svg class="icon-svg" viewBox="0 0 24 24" style="width:28px; height:28px; stroke: var(--accent-color);">
+            <rect x="4" y="2" width="16" height="20" rx="2"></rect>
+            <line x1="4" y1="10" x2="20" y2="10"></line>
+            <line x1="10" y1="4" x2="10" y2="8"></line>
+            <line x1="10" y1="14" x2="10" y2="18"></line>
+        </svg>
+        <h1>نظام تعبئة الثلاجات</h1>
+    </div>
+
+    <!-- Tabs Navigation -->
+    <div class="tabs">
+        <button class="tab-btn active" id="btn-tab-fill" onclick="switchTab('fill')">تعبئة </button>
+        <button class="tab-btn" id="btn-tab-summary" onclick="switchTab('summary')">القائمة النهائية</button>
+        <button class="tab-btn" id="btn-tab-settings" onclick="switchTab('settings')">الإعدادات</button>
+    </div>
+
+    <!-- TAB 1: Fill Inventory -->
+    <div id="tab-fill">
+        <div class="card">
+            <label>اختر الثلاجة التي أمامك:</label>
+            <select id="fill-fridge-select" onchange="renderFillList()"></select>
+        </div>
+
+        <div class="card">
+            <h2 style="font-size: 1.1rem; color: var(--accent-color); margin-bottom: 12px;">المنتجات والكميات الناقصة</h2>
+            <div id="fill-list-container"></div>
+        </div>
+    </div>
+
+    <!-- TAB 2: Summary -->
+    <div id="tab-summary" style="display: none;">
+        <div class="card">
+            <h2 style="font-size: 1.1rem; color: var(--accent-color); margin-bottom: 12px;">مجموع السلعة المطلوبة </h2>
+            <div id="summary-container"></div>
+            
+            <button onclick="resetData()" class="btn-danger" style="width: 100%; margin-top: 20px; padding: 12px; font-weight: bold; justify-content: center;">
+                تصفير الجدول للبدء من جديد
+            </button>
+        </div>
+    </div>
+
+    <!-- TAB 3: Settings -->
+    <div id="tab-settings" style="display: none;">
+        <!-- Add Fridge -->
+        <div class="card">
+            <h3 style="font-size: 1rem; color: var(--accent-color); margin-bottom: 10px;">إضافة ثلاجة جديدة</h3>
+            <div class="flex-row">
+                <input type="text" id="new-fridge-name" placeholder="مثال: ثلاجة كوكا" style="margin:0;">
+                <button onclick="addFridge()" style="width: 90px; margin:0;">إضافة</button>
+            </div>
+            <div id="fridges-list" style="margin-top: 10px;"></div>
+        </div>
+
+        <!-- Add Product to Specific Fridge -->
+        <div class="card">
+            <h3 style="font-size: 1rem; color: var(--accent-color); margin-bottom: 10px;">إضافة منتج لثلاجة معينة</h3>
+            <label>اختر الثلاجة:</label>
+            <select id="target-fridge-select"></select>
+            
+            <label>اسم المنتج / الماركة:</label>
+            <input type="text" id="new-prod-name" placeholder="مثال: كوكا كولا 0.5L">
+            
+            <button onclick="addProduct()">إضافة المنتج للثلاجة</button>
+            
+            <h4 style="font-size: 0.9rem; color: var(--text-muted); margin-top: 15px; margin-bottom: 5px;">قائمة المنتجات لكل ثلاجة:</h4>
+            <div id="products-list"></div>
+        </div>
+    </div>
+
+    <script>
+        let state = JSON.parse(localStorage.getItem('fridge_app_data_v3')) || {
+            fridges: ['ثلاجة كوكا', 'ثلاجة العصائر'],
+            products: [
+                { id: '1', fridge: 'ثلاجة كوكا', name: 'كوكا كولا 0.5L' },
+                { id: '2', fridge: 'ثلاجة كوكا', name: 'كوكا كولا 1.5L' },
+                { id: '3', fridge: 'ثلاجة كوكا', name: 'فانتا برتقال' },
+                { id: '4', fridge: 'ثلاجة العصائر', name: 'عصير عين أطلس' }
+            ],
+            inventory: {} 
+        };
+
+        function saveData() {
+            localStorage.setItem('fridge_app_data_v3', JSON.stringify(state));
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('tab-fill').style.display = 'none';
+            document.getElementById('tab-summary').style.display = 'none';
+            document.getElementById('tab-settings').style.display = 'none';
+
+            if(tabName === 'fill') {
+                document.getElementById('tab-fill').style.display = 'block';
+                document.getElementById('btn-tab-fill').classList.add('active');
+                renderFillList();
+            } else if(tabName === 'summary') {
+                document.getElementById('tab-summary').style.display = 'block';
+                document.getElementById('btn-tab-summary').classList.add('active');
+                renderSummary();
+            } else if(tabName === 'settings') {
+                document.getElementById('tab-settings').style.display = 'block';
+                document.getElementById('btn-tab-settings').classList.add('active');
+                renderSettings();
+            }
+        }
+
+        function renderSettings() {
+            const fridgeList = document.getElementById('fridges-list');
+            fridgeList.innerHTML = state.fridges.map((f, i) => `
+                <div class="item-list-row">
+                    <span>${f}</span>
+                    <button class="btn-danger" onclick="deleteFridge(${i})">حذف</button>
+                </div>
+            `).join('');
+
+            const targetSelect = document.getElementById('target-fridge-select');
+            targetSelect.innerHTML = state.fridges.map(f => `<option value="${f}">${f}</option>`).join('');
+
+            const prodList = document.getElementById('products-list');
+            if (state.products.length === 0) {
+                prodList.innerHTML = "<p class='empty-msg'>لا توجد منتجات مضافة بعد.</p>";
+                return;
+            }
+
+            prodList.innerHTML = state.products.map((p, index) => `
+                <div class="item-list-row">
+                    <div>
+                        <strong>${p.name}</strong>
+                        <br><small style="color: var(--accent-color);">${p.fridge}</small>
+                    </div>
+                    <button class="btn-danger" onclick="deleteProduct(${index})">حذف</button>
+                </div>
+            `).join('');
+        }
+
+        function addFridge() {
+            const val = document.getElementById('new-fridge-name').value.trim();
+            if(val) { 
+                if(!state.fridges.includes(val)) {
+                    state.fridges.push(val); 
+                    saveData(); 
+                    renderSettings(); 
+                    populateFridgeDropdown(); 
+                    document.getElementById('new-fridge-name').value = ''; 
+                } else {
+                    alert('هذه الثلاجة موجودة بالفعل!');
+                }
+            }
+        }
+
+        function deleteFridge(i) { 
+            const fridgeName = state.fridges[i];
+            state.fridges.splice(i, 1); 
+            state.products = state.products.filter(p => p.fridge !== fridgeName);
+            saveData(); 
+            renderSettings(); 
+            populateFridgeDropdown(); 
+        }
+
+        function addProduct() {
+            const targetFridge = document.getElementById('target-fridge-select').value;
+            const name = document.getElementById('new-prod-name').value.trim();
+            
+            if(!targetFridge) {
+                alert('الرجاء اختيار الثلاجة أولاً!');
+                return;
+            }
+
+            if(name) { 
+                state.products.push({
+                    id: Date.now().toString(),
+                    fridge: targetFridge,
+                    name: name
+                }); 
+                saveData(); 
+                renderSettings(); 
+                document.getElementById('new-prod-name').value = ''; 
+            }
+        }
+
+        function deleteProduct(index) { 
+            state.products.splice(index, 1); 
+            saveData(); 
+            renderSettings(); 
+        }
+
+        function populateFridgeDropdown() {
+            const select = document.getElementById('fill-fridge-select');
+            const currentVal = select.value;
+            select.innerHTML = state.fridges.map(f => `<option value="${f}">${f}</option>`).join('');
+            if(state.fridges.includes(currentVal)) {
+                select.value = currentVal;
+            }
+        }
+
+        function renderFillList() {
+            populateFridgeDropdown();
+            const currentFridge = document.getElementById('fill-fridge-select').value;
+            const container = document.getElementById('fill-list-container');
+            
+            if(!currentFridge || state.fridges.length === 0) {
+                container.innerHTML = "<p class='empty-msg'>الرجاء إضافة ثلاجة من زر الإعدادات أولاً.</p>";
+                return;
+            }
+
+            const filteredProducts = state.products.filter(p => p.fridge === currentFridge);
+
+            if(filteredProducts.length === 0) {
+                container.innerHTML = `<p class='empty-msg'>لا توجد منتجات مخصصة لـ (${currentFridge}). قم بإضافتها من الإعدادات.</p>`;
+                return;
+            }
+
+            container.innerHTML = filteredProducts.map(prod => {
+                const key = `${currentFridge}_${prod.name}`;
+                const count = state.inventory[key] || 0;
+                return `
+                    <div class="counter-box">
+                        <div>
+                            <strong>${prod.name}</strong>
+                        </div>
+                        <div class="flex-row">
+                            <button class="counter-btn" onclick="updateCount('${key}', -1)">-</button>
+                            <span style="font-weight:bold; width: 32px; text-align:center;">${count}</span>
+                            <button class="counter-btn" onclick="updateCount('${key}', 1)">+</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateCount(key, change) {
+            let current = state.inventory[key] || 0;
+            current += change;
+            if(current < 0) current = 0;
+            state.inventory[key] = current;
+            saveData();
+            renderFillList();
+        }
+
+        function renderSummary() {
+            const container = document.getElementById('summary-container');
+            const totals = {};
+
+            Object.keys(state.inventory).forEach(key => {
+                const count = state.inventory[key];
+                if(count > 0) {
+                    const prodName = key.split('_')[1];
+                    totals[prodName] = (totals[prodName] || 0) + count;
+                }
+            });
+
+            if(Object.keys(totals).length === 0) {
+                container.innerHTML = "<p class='empty-msg'>لا توجد أي سلعة مطلوبة حالياً.</p>";
+                return;
+            }
+
+            container.innerHTML = Object.entries(totals).map(([prod, count]) => `
+                <div class="summary-item">
+                    <span>${prod}</span>
+                    <span style="color: var(--accent-color); font-weight: bold;">${count} بياسة</span>
+                </div>
+            `).join('');
+        }
+
+        function resetData() {
+            if(confirm("واش متأكد بغيتي تصفر الكميات الناقصة وتبدأ جرد جديد؟")) {
+                state.inventory = {};
+                saveData();
+                renderSummary();
+            }
+        }
+
+        populateFridgeDropdown();
+        renderFillList();
+    </script>
+</body>
+</html>
